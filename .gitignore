@@ -1,0 +1,55 @@
+# macOS and iOS specific
+.DS_Store
+*.DS_Store
+
+# Build artifacts
+build/
+Build/
+DerivedData/
+
+# Xcode specific
+*.xcworkspace
+!Pods/
+xcuserdata/
+*.xccheckout
+*.xcscmblueprint
+*.xcodeproj/*
+!*.xcodeproj/project.pbxproj
+!*.xcodeproj/xcshareddata/
+!*.xcodeproj/xcshareddata/*
+*.xcmappingmodel
+*.xcassets
+
+# Swift Package Manager
+.swiftpm/
+.build/
+Package.resolved
+
+# Cocoapods
+Pods/
+Podfile.lock
+
+# Carthage
+Carthage/Build/
+
+# Fastlane
+fastlane/report.xml
+fastlane/Preview.html
+fastlane/screenshots
+fastlane/test_output
+# Bundle stuff (replace with [name].xcarchive)
+*.xcarchive
+
+# Temporary files
+*.swp
+*.lock
+*.tmp
+*.log
+*.bak
+
+# Unit test/coverage files
+*.xctest
+*.xctestplan
+
+# Shared schemes
+xcshareddata/
