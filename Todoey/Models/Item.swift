@@ -8,7 +8,8 @@
 
 import Foundation
 
-class Item {
+class Item: Encodable, Decodable {
+  var id: UUID = UUID()
   var title: String
   var done: Bool = false
 

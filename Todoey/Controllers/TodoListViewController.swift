@@ -10,24 +10,50 @@ import UIKit
 
 class TodoListViewController: UITableViewController {
 
-  var itemArray = ["Find Mike", "Buy Eggos", "Destroy Demorgon"]
+//  var itemArray = ["Find Mike", "Buy Eggos", "Destroy Demorgon"]
+  var itemArray = [Item]()
 
-  let defaults = UserDefaults.standard
+  // 246. Commenting this to use our own plist.
+  // let defaults = UserDefaults.standard
+
+  // 246. Create our own plist file with our own data type.
+  let dataFilePath = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first?.appendingPathComponent("Items.plist")
 
   override func viewDidLoad() {
       super.viewDidLoad()
-      // Do any additional setup after loading the view.
+
+    print(dataFilePath)
+
 
     // 238. Retrieving data from User Defaults
-    if let items = defaults.array(forKey: "TodoListArray") as? [String] {
-      itemArray = items
-    }
+//    if let items = defaults.array(forKey: "TodoListArray") as? [String] {
+//      itemArray = items
+//    }
+
+    // 247. Commentint the following because
+    // We're now loading our own plist file with our own data type.
+    // let itemOne = Item(title: "Find Mike")
+    // let itemTwo = Item(title: "Buy Eggos")
+    // let itemThree = Item(title: "Destroy Demorgon")
+
+    // itemArray.append(itemOne)
+    // itemArray.append(itemTwo)
+    //itemArray.append(itemThree)
+
+    // 247. Load our own plist file with our own data type.
+    loadData()
   }
 
-  // MARK - Tableview Datasource Methods
+  // MARK: - Tableview Datasource Methods
   override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+
     let cell = tableView.dequeueReusableCell(withIdentifier: "ToDoItemCell", for: indexPath)
-    cell.textLabel?.text = itemArray[indexPath.row]
+
+    let item = itemArray[indexPath.row]
+
+    cell.textLabel?.text = item.title
+
+    cell.accessoryType = item.done ? .checkmark : .none
 
     return cell
   }
@@ -41,11 +67,19 @@ class TodoListViewController: UITableViewController {
     print(itemArray[indexPath.row])
 
 
-    if tableView.cellForRow(at: indexPath)?.accessoryType == .checkmark {
-      tableView.cellForRow(at: indexPath)?.accessoryType = .none
-    } else {
-      tableView.cellForRow(at: indexPath)?.accessoryType = .checkmark
-    }
+//    if tableView.cellForRow(at: indexPath)?.accessoryType == .checkmark {
+//      tableView.cellForRow(at: indexPath)?.accessoryType = .none
+//    } else {
+//      tableView.cellForRow(at: indexPath)?.accessoryType = .checkmark
+//    }
+
+    itemArray[indexPath.row].done = !itemArray[indexPath.row].done
+
+    // 246. Writing to our own plist.
+    saveData()
+
+    // Forces the call of the Data delegate methods
+    tableView.reloadData()
 
 //    tableView.cellForRow(at: indexPath)?.accessoryType = .checkmark
 
@@ -61,9 +95,16 @@ class TodoListViewController: UITableViewController {
     let action = UIAlertAction(title: "Add", style: .default) { action in
       // What happens once the user clicks the CTA
       print("Success", textField.text ?? "")
-      self.itemArray.append(textField.text ?? "")
 
-      self.defaults.set(self.itemArray, forKey: "TodoListArray")
+      let newItem = Item(title: textField.text ?? "")
+      self.itemArray.append(newItem)
+
+      // 246. Commenting this to use our own plist.
+      // self.defaults.set(self.itemArray, forKey: "TodoListArray")
+
+      // 246. Writing to our own plist.
+      self.saveData()
+
 
 
       self.tableView.reloadData()
@@ -78,6 +119,28 @@ class TodoListViewController: UITableViewController {
     alert.addAction(action)
 
     present(alert, animated: true, completion: nil)
+  }
+
+  func saveData() {
+
+    let encoder = PropertyListEncoder()
+    do {
+      let data = try encoder.encode(self.itemArray)
+      try data.write(to: self.dataFilePath!)
+    } catch {
+      print("Error encoding item array: \(error)")
+    }
+  }
+
+  func loadData() {
+    if let data = try? Data(contentsOf: self.dataFilePath!) {
+      let decoder = PropertyListDecoder()
+      do {
+        self.itemArray = try decoder.decode([Item].self, from: data)
+      } catch {
+        print("Error decoding item array: \(error)")
+      }
+    }
   }
 
 }
