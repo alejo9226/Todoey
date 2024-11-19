@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import CoreData
 
 class TodoListViewController: UITableViewController {
 
@@ -17,7 +18,7 @@ class TodoListViewController: UITableViewController {
   // let defaults = UserDefaults.standard
 
   // 246. Create our own plist file with our own data type.
-  let dataFilePath = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first?.appendingPathComponent("Items.plist")
+  // let dataFilePath = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first?.appendingPathComponent("Items.plist")
 
   // 250. Setting up the code to use CoreData, this is how we use the AppDelegate context.
   let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
@@ -25,7 +26,7 @@ class TodoListViewController: UITableViewController {
   override func viewDidLoad() {
       super.viewDidLoad()
 
-    print(dataFilePath!)
+    // print(dataFilePath!)
 
 
     // 238. Retrieving data from User Defaults
@@ -45,7 +46,7 @@ class TodoListViewController: UITableViewController {
 
     // 247. Load our own plist file with our own data type.
     // 250. Commenting this to use core data
-    // loadData()
+     loadData()
   }
 
   // MARK: - Tableview Datasource Methods
@@ -70,6 +71,9 @@ class TodoListViewController: UITableViewController {
     print(indexPath.row)
     print(itemArray[indexPath.row])
 
+    // 254. This is the command (setValue) to update keys in the NSManaged Object
+    // Commented out bcs we're updating it by its done prop directly.
+    // itemArray[indexPath.row].setValue(false, forKey: "done")
 
 //    if tableView.cellForRow(at: indexPath)?.accessoryType == .checkmark {
 //      tableView.cellForRow(at: indexPath)?.accessoryType = .none
@@ -77,13 +81,15 @@ class TodoListViewController: UITableViewController {
 //      tableView.cellForRow(at: indexPath)?.accessoryType = .checkmark
 //    }
 
-    itemArray[indexPath.row].done = !itemArray[indexPath.row].done
+    // 255. Trying deleting stuff from CoreData.
+    // Commenting it out since not being used.
+    // context.delete(itemArray[indexPath.row])
+    // itemArray.remove(at: indexPath.row)
+
+//    itemArray[indexPath.row].done = !itemArray[i  ndexPath.row].done
 
     // 246. Writing to our own plist.
     saveData()
-
-    // Forces the call of the Data delegate methods
-    tableView.reloadData()
 
 //    tableView.cellForRow(at: indexPath)?.accessoryType = .checkmark
 
@@ -111,10 +117,6 @@ class TodoListViewController: UITableViewController {
 
       // 246. Writing to our own plist.
       self.saveData()
-
-
-
-      self.tableView.reloadData()
     }
 
     alert.addTextField { alertTextField in
@@ -139,21 +141,34 @@ class TodoListViewController: UITableViewController {
 
       // 250. Saving CoreData context
       try context.save()
+
+      // Forces the call of the Data delegate methods
+      tableView.reloadData()
     } catch {
       print("Error saving context: \(error)")
     }
   }
 
-//  func loadData() {
-//    if let data = try? Data(contentsOf: self.dataFilePath!) {
-//      let decoder = PropertyListDecoder()
-//      do {
-//        self.itemArray = try decoder.decode([Item].self, from: data)
-//      } catch {
-//        print("Error decoding item array: \(error)")
-//      }
-//    }
-//  }
+  func loadData() {
+
+      // 253. Commenting the following to implement Core Data Reading
+      //    if let data = try? Data(contentsOf: self.dataFilePath!) {
+      //      let decoder = PropertyListDecoder()
+      //      do {
+      //        self.itemArray = try decoder.decode([Item].self, from: data)
+      //      } catch {
+      //        print("Error decoding item array: \(error)")
+      //      }
+      //    }
+    let request: NSFetchRequest<Item> = Item.fetchRequest()
+
+    do {
+      itemArray = try context.fetch(request)
+    } catch {
+      print("Error fetching context: \(error)")
+    }
+
+  }
 
 }
 
