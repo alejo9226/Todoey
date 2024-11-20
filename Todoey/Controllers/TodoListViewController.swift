@@ -149,7 +149,7 @@ class TodoListViewController: UITableViewController {
     }
   }
 
-  func loadData() {
+  func loadData(with request: NSFetchRequest<Item> = Item.fetchRequest()) {
 
       // 253. Commenting the following to implement Core Data Reading
       //    if let data = try? Data(contentsOf: self.dataFilePath!) {
@@ -160,15 +160,53 @@ class TodoListViewController: UITableViewController {
       //        print("Error decoding item array: \(error)")
       //      }
       //    }
-    let request: NSFetchRequest<Item> = Item.fetchRequest()
-
     do {
       itemArray = try context.fetch(request)
+
+      tableView.reloadData()
     } catch {
       print("Error fetching context: \(error)")
     }
 
   }
+}
 
+// MARK: - Search bar methods
+extension TodoListViewController: UISearchBarDelegate {
+  func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
+
+    if let text = searchBar.text, !text.isEmpty {
+      let request: NSFetchRequest<Item> = Item.fetchRequest()
+
+      request.predicate = NSPredicate(format: "title CONTAINS[cd] %@", text)
+      request.sortDescriptors = [NSSortDescriptor(key: "title", ascending: true)]
+
+      loadData(with: request)
+    } else {
+      loadData()
+    }
+  }
+
+  func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
+
+    if searchBar.text?.isEmpty == true {
+      loadData()
+
+      // This has to be executed in the main thread,
+      // it's a UI update
+      DispatchQueue.main.async {
+        searchBar.resignFirstResponder()
+      }
+
+    } else {
+
+      let request: NSFetchRequest<Item> = Item.fetchRequest()
+
+      request.predicate = NSPredicate(format: "title CONTAINS[cd] %@", searchBar.text!)
+      request.sortDescriptors = [NSSortDescriptor(key: "title", ascending: true)]
+
+      loadData(with: request)
+    }
+  }
 }
 
