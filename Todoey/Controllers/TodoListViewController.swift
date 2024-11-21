@@ -14,6 +14,12 @@ class TodoListViewController: UITableViewController {
 //  var itemArray = ["Find Mike", "Buy Eggos", "Destroy Demorgon"]
   var itemArray = [Item]()
 
+  var selectedCategory: Category? {
+    didSet {
+      loadData()
+    }
+  }
+
   // 246. Commenting this to use our own plist.
   // let defaults = UserDefaults.standard
 
@@ -58,6 +64,8 @@ class TodoListViewController: UITableViewController {
 
     cell.textLabel?.text = item.title
 
+    print("item.done:", item.done)
+
     cell.accessoryType = item.done ? .checkmark : .none
 
     return cell
@@ -86,7 +94,7 @@ class TodoListViewController: UITableViewController {
     // context.delete(itemArray[indexPath.row])
     // itemArray.remove(at: indexPath.row)
 
-//    itemArray[indexPath.row].done = !itemArray[i  ndexPath.row].done
+    itemArray[indexPath.row].done = !itemArray[indexPath.row].done
 
     // 246. Writing to our own plist.
     saveData()
@@ -109,6 +117,7 @@ class TodoListViewController: UITableViewController {
       let newItem = Item(context: self.context)
       newItem.title = textField.text!
       newItem.done = false
+      newItem.parentCategory = self.selectedCategory
 
       self.itemArray.append(newItem)
 
@@ -149,7 +158,7 @@ class TodoListViewController: UITableViewController {
     }
   }
 
-  func loadData(with request: NSFetchRequest<Item> = Item.fetchRequest()) {
+  func loadData(with request: NSFetchRequest<Item> = Item.fetchRequest(), predicate: NSPredicate? = nil) {
 
       // 253. Commenting the following to implement Core Data Reading
       //    if let data = try? Data(contentsOf: self.dataFilePath!) {
@@ -160,6 +169,15 @@ class TodoListViewController: UITableViewController {
       //        print("Error decoding item array: \(error)")
       //      }
       //    }
+    // 260. Generating a compound predicate.
+    let categoryPredicate = NSPredicate(format: "parentCategory.name MATCHES %@", selectedCategory!.name!)
+
+    if let additionalPredicate = predicate {
+      request.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [categoryPredicate, additionalPredicate])
+    } else {
+      request.predicate = categoryPredicate
+    }
+
     do {
       itemArray = try context.fetch(request)
 
@@ -178,10 +196,10 @@ extension TodoListViewController: UISearchBarDelegate {
     if let text = searchBar.text, !text.isEmpty {
       let request: NSFetchRequest<Item> = Item.fetchRequest()
 
-      request.predicate = NSPredicate(format: "title CONTAINS[cd] %@", text)
+      let predicate = NSPredicate(format: "title CONTAINS[cd] %@", text)
       request.sortDescriptors = [NSSortDescriptor(key: "title", ascending: true)]
 
-      loadData(with: request)
+      loadData(with: request, predicate: predicate)
     } else {
       loadData()
     }
@@ -202,10 +220,10 @@ extension TodoListViewController: UISearchBarDelegate {
 
       let request: NSFetchRequest<Item> = Item.fetchRequest()
 
-      request.predicate = NSPredicate(format: "title CONTAINS[cd] %@", searchBar.text!)
+      let predicate = NSPredicate(format: "title CONTAINS[cd] %@", searchBar.text!)
       request.sortDescriptors = [NSSortDescriptor(key: "title", ascending: true)]
 
-      loadData(with: request)
+      loadData(with: request, predicate: predicate)
     }
   }
 }
