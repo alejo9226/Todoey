@@ -16,7 +16,7 @@ class TodoListViewController: UITableViewController {
 
   var selectedCategory: Category? {
     didSet {
-      loadData()
+      //loadData()
     }
   }
 
@@ -52,7 +52,7 @@ class TodoListViewController: UITableViewController {
 
     // 247. Load our own plist file with our own data type.
     // 250. Commenting this to use core data
-     loadData()
+//     loadData()
   }
 
   // MARK: - Tableview Datasource Methods
@@ -114,12 +114,12 @@ class TodoListViewController: UITableViewController {
       // What happens once the user clicks the CTA
       print("Success", textField.text ?? "")
 
-      let newItem = Item(context: self.context)
-      newItem.title = textField.text!
-      newItem.done = false
-      newItem.parentCategory = self.selectedCategory
-
-      self.itemArray.append(newItem)
+//      let newItem = Item(context: self.context)
+//      newItem.title = textField.text!
+//      newItem.done = false
+//      newItem.parentCategory = self.selectedCategory
+//
+//      self.itemArray.append(newItem)
 
       // 246. Commenting this to use our own plist.
       // self.defaults.set(self.itemArray, forKey: "TodoListArray")
@@ -158,73 +158,73 @@ class TodoListViewController: UITableViewController {
     }
   }
 
-  func loadData(with request: NSFetchRequest<Item> = Item.fetchRequest(), predicate: NSPredicate? = nil) {
-
-      // 253. Commenting the following to implement Core Data Reading
-      //    if let data = try? Data(contentsOf: self.dataFilePath!) {
-      //      let decoder = PropertyListDecoder()
-      //      do {
-      //        self.itemArray = try decoder.decode([Item].self, from: data)
-      //      } catch {
-      //        print("Error decoding item array: \(error)")
-      //      }
-      //    }
-    // 260. Generating a compound predicate.
-    let categoryPredicate = NSPredicate(format: "parentCategory.name MATCHES %@", selectedCategory!.name!)
-
-    if let additionalPredicate = predicate {
-      request.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [categoryPredicate, additionalPredicate])
-    } else {
-      request.predicate = categoryPredicate
-    }
-
-    do {
-      itemArray = try context.fetch(request)
-
-      tableView.reloadData()
-    } catch {
-      print("Error fetching context: \(error)")
-    }
-
-  }
+//  func loadData(with request: NSFetchRequest<Item> = Item.fetchRequest(), predicate: NSPredicate? = nil) {
+//
+//      // 253. Commenting the following to implement Core Data Reading
+//      //    if let data = try? Data(contentsOf: self.dataFilePath!) {
+//      //      let decoder = PropertyListDecoder()
+//      //      do {
+//      //        self.itemArray = try decoder.decode([Item].self, from: data)
+//      //      } catch {
+//      //        print("Error decoding item array: \(error)")
+//      //      }
+//      //    }
+//    // 260. Generating a compound predicate.
+//    let categoryPredicate = NSPredicate(format: "parentCategory.name MATCHES %@", selectedCategory!.name!)
+//
+//    if let additionalPredicate = predicate {
+//      request.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [categoryPredicate, additionalPredicate])
+//    } else {
+//      request.predicate = categoryPredicate
+//    }
+//
+//    do {
+//      itemArray = try context.fetch(request)
+//
+//      tableView.reloadData()
+//    } catch {
+//      print("Error fetching context: \(error)")
+//    }
+//
+//  }
 }
 
 // MARK: - Search bar methods
-extension TodoListViewController: UISearchBarDelegate {
-  func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
-
-    if let text = searchBar.text, !text.isEmpty {
-      let request: NSFetchRequest<Item> = Item.fetchRequest()
-
-      let predicate = NSPredicate(format: "title CONTAINS[cd] %@", text)
-      request.sortDescriptors = [NSSortDescriptor(key: "title", ascending: true)]
-
-      loadData(with: request, predicate: predicate)
-    } else {
-      loadData()
-    }
-  }
-
-  func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
-
-    if searchBar.text?.isEmpty == true {
-      loadData()
-
-      // This has to be executed in the main thread,
-      // it's a UI update
-      DispatchQueue.main.async {
-        searchBar.resignFirstResponder()
-      }
-
-    } else {
-
-      let request: NSFetchRequest<Item> = Item.fetchRequest()
-
-      let predicate = NSPredicate(format: "title CONTAINS[cd] %@", searchBar.text!)
-      request.sortDescriptors = [NSSortDescriptor(key: "title", ascending: true)]
-
-      loadData(with: request, predicate: predicate)
-    }
-  }
-}
+//extension TodoListViewController: UISearchBarDelegate {
+//  func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
+//
+//    if let text = searchBar.text, !text.isEmpty {
+//      let request: NSFetchRequest<Item> = Item.fetchRequest()
+//
+//      let predicate = NSPredicate(format: "title CONTAINS[cd] %@", text)
+//      request.sortDescriptors = [NSSortDescriptor(key: "title", ascending: true)]
+//
+//      loadData(with: request, predicate: predicate)
+//    } else {
+//      loadData()
+//    }
+//  }
+//
+//  func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
+//
+//    if searchBar.text?.isEmpty == true {
+//      loadData()
+//
+//      // This has to be executed in the main thread,
+//      // it's a UI update
+//      DispatchQueue.main.async {
+//        searchBar.resignFirstResponder()
+//      }
+//
+//    } else {
+//
+//      let request: NSFetchRequest<Item> = Item.fetchRequest()
+//
+//      let predicate = NSPredicate(format: "title CONTAINS[cd] %@", searchBar.text!)
+//      request.sortDescriptors = [NSSortDescriptor(key: "title", ascending: true)]
+//
+//      loadData(with: request, predicate: predicate)
+//    }
+//  }
+//}
 

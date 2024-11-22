@@ -2,18 +2,15 @@
 //  Item.swift
 //  Todoey
 //
-//  Created by Alejandro Alfaro on 30/10/24.
+//  Created by Alejandro Alfaro on 21/11/24.
 //  Copyright © 2024 App Brewery. All rights reserved.
 //
 
 import Foundation
+import RealmSwift
 
-class Item: Encodable, Decodable {
-  var id: UUID = UUID()
-  var title: String
-  var done: Bool = false
-
-  init(title: String) {
-    self.title = title
-  }
+class Item: Object {
+  @objc dynamic var title: String = ""
+  @objc dynamic var done: Bool = false
+  var parentCategory = LinkingObjects(fromType: Category.self, property: "items")
 }

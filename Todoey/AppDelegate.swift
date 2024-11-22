@@ -8,6 +8,7 @@
 
 import UIKit
 import CoreData
+import RealmSwift
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
@@ -16,11 +17,22 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
-        // Override point for customization after application launch.
+      // Override point for customization after application launch.
 
-        // This is to show the User Defaults location in the device.
-        print(NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true).last! as String)
-        return true
+      // This is to show the User Defaults location in the device.
+      // print(NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true).last! as String)
+
+      // 261. Location of the Realm file
+      print(Realm.Configuration.defaultConfiguration.fileURL!)
+
+      // Initialize Realm
+      do {
+        let realm = try! Realm()
+      } catch {
+        print("Error initializing Realm: \(error)")
+      }
+
+      return true
     }
 
     func applicationWillTerminate(_ application: UIApplication) {

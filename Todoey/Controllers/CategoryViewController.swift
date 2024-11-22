@@ -7,9 +7,11 @@
 //
 
 import UIKit
-import CoreData
+import RealmSwift
 
 class CategoryViewController: UITableViewController {
+
+  let realm = try! Realm()
 
   var categories = [Category]()
 
@@ -18,7 +20,7 @@ class CategoryViewController: UITableViewController {
   override func viewDidLoad() {
       super.viewDidLoad()
 
-      loadData()
+//      loadData()
   }
 
   // MARK: - Add new Categories
@@ -34,12 +36,12 @@ class CategoryViewController: UITableViewController {
       // What happens once the user clicks the CTA
       print("Success", textField.text ?? "")
 
-      let newCategory = Category(context: self.context)
+      let newCategory = Category()
       newCategory.name = textField.text!
 
       self.categories.append(newCategory)
 
-      self.saveData()
+      self.saveData(category: newCategory)
     }
 
     alert.addTextField { alertTextField in
@@ -73,9 +75,13 @@ class CategoryViewController: UITableViewController {
 
   // MARK: - Data manipulation methods
 
-  func saveData() {
+  func saveData(category: Category) {
+
+
     do {
-      try context.save()
+      try realm.write {
+        realm.add(category)
+      }
 
       // Forces the call of the Data delegate methods
       tableView.reloadData()
@@ -84,17 +90,17 @@ class CategoryViewController: UITableViewController {
     }
   }
 
-  func loadData(with request: NSFetchRequest<Category> = Category.fetchRequest()) {
-
-    do {
-      categories = try context.fetch(request)
-
-      tableView.reloadData()
-    } catch {
-      print("Error fetching context: \(error)")
-    }
-
-  }
+//  func loadData(with request: NSFetchRequest<Category> = Category.fetchRequest()) {
+//
+//    do {
+//      categories = try context.fetch(request)
+//
+//      tableView.reloadData()
+//    } catch {
+//      print("Error fetching context: \(error)")
+//    }
+//
+//  }
 
   // MARK: - TableView Delegate Methods
 
