@@ -13,14 +13,18 @@ class CategoryViewController: UITableViewController {
 
   let realm = try! Realm()
 
-  var categories = [Category]()
+  // 264. Realm returns Results of type Category
+  // var categories = [Category]()
+  var categories: Results<Category>?
 
   let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
 
   override func viewDidLoad() {
       super.viewDidLoad()
 
-//      loadData()
+      self.title = "Todoey"
+
+      loadData()
   }
 
   // MARK: - Add new Categories
@@ -39,7 +43,10 @@ class CategoryViewController: UITableViewController {
       let newCategory = Category()
       newCategory.name = textField.text!
 
-      self.categories.append(newCategory)
+      // Commenting this out since in Realm
+      // Results auto update and monitor for
+      // changes itself
+      // self.categories.append(newCategory)
 
       self.saveData(category: newCategory)
     }
@@ -62,15 +69,13 @@ class CategoryViewController: UITableViewController {
 
     let cell = tableView.dequeueReusableCell(withIdentifier: "CategoryCell", for: indexPath)
 
-    let category = categories[indexPath.row]
-
-    cell.textLabel?.text = category.name
+    cell.textLabel?.text = categories?[indexPath.row].name ?? "No categories added yet"
 
     return cell
   }
 
   override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-    return categories.count
+    return categories?.count ?? 1
   }
 
   // MARK: - Data manipulation methods
@@ -90,8 +95,11 @@ class CategoryViewController: UITableViewController {
     }
   }
 
-//  func loadData(with request: NSFetchRequest<Category> = Category.fetchRequest()) {
-//
+  func loadData() {
+
+    categories = realm.objects(Category.self)
+
+    // Commenting this out to use Realm
 //    do {
 //      categories = try context.fetch(request)
 //
@@ -99,8 +107,7 @@ class CategoryViewController: UITableViewController {
 //    } catch {
 //      print("Error fetching context: \(error)")
 //    }
-//
-//  }
+  }
 
   // MARK: - TableView Delegate Methods
 
@@ -116,7 +123,7 @@ class CategoryViewController: UITableViewController {
 
     // Grab the current selected row.
     if let indexPath = tableView.indexPathForSelectedRow {
-      destinationVC.selectedCategory = categories[indexPath.row]
+      destinationVC.selectedCategory = categories?[indexPath.row]
     }
 
   }
