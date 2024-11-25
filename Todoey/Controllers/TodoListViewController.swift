@@ -111,6 +111,10 @@ class TodoListViewController: UITableViewController {
       do {
         try realm.write {
           item.done = !item.done
+
+          // 265. Implementing Delete in Realm
+          // Commented out bcs we don't want that UX
+          // realm.delete(item)
         }
       } catch {
         print("Error saving done status, \(error)")
