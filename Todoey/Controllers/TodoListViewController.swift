@@ -106,6 +106,19 @@ class TodoListViewController: UITableViewController {
 
 //    tableView.cellForRow(at: indexPath)?.accessoryType = .checkmark
 
+    // 264. Implementing Update in CRUD
+    if let item = toDoItems?[indexPath.row] {
+      do {
+        try realm.write {
+          item.done = !item.done
+        }
+      } catch {
+        print("Error saving done status, \(error)")
+      }
+    }
+
+    tableView.reloadData()
+
     tableView.deselectRow(at: indexPath, animated: true)
 
   }
