@@ -17,7 +17,8 @@ class CategoryViewController: UITableViewController {
   // var categories = [Category]()
   var categories: Results<Category>?
 
-  let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
+  // 268. Commenting this out since we're switching to Realm
+  // let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
 
   override func viewDidLoad() {
       super.viewDidLoad()
@@ -103,7 +104,7 @@ class CategoryViewController: UITableViewController {
 //    do {
 //      categories = try context.fetch(request)
 //
-//      tableView.reloadData()
+      tableView.reloadData()
 //    } catch {
 //      print("Error fetching context: \(error)")
 //    }

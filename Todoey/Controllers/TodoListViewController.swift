@@ -126,6 +126,7 @@ class TodoListViewController: UITableViewController {
     tableView.deselectRow(at: indexPath, animated: true)
 
   }
+
   @IBAction func addButtonPressed(_ sender: UIBarButtonItem) {
     var textField = UITextField()
 
@@ -141,7 +142,9 @@ class TodoListViewController: UITableViewController {
           try self.realm.write {
             let newItem = Item()
             newItem.title = textField.text!
+
             currentCategory.items.append(newItem)
+
             self.realm.add(newItem)
           }
         } catch {
@@ -237,41 +240,51 @@ class TodoListViewController: UITableViewController {
 }
 
 // MARK: - Search bar methods
-//extension TodoListViewController: UISearchBarDelegate {
-//  func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
-//
-//    if let text = searchBar.text, !text.isEmpty {
+extension TodoListViewController: UISearchBarDelegate {
+  func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
+
+    if let text = searchBar.text, !text.isEmpty {
+      // 267. Querying data in Realm, commenting out CoreData implementation
 //      let request: NSFetchRequest<Item> = Item.fetchRequest()
 //
 //      let predicate = NSPredicate(format: "title CONTAINS[cd] %@", text)
 //      request.sortDescriptors = [NSSortDescriptor(key: "title", ascending: true)]
 //
 //      loadData(with: request, predicate: predicate)
-//    } else {
-//      loadData()
-//    }
-//  }
-//
-//  func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
-//
-//    if searchBar.text?.isEmpty == true {
-//      loadData()
-//
-//      // This has to be executed in the main thread,
-//      // it's a UI update
-//      DispatchQueue.main.async {
-//        searchBar.resignFirstResponder()
-//      }
-//
-//    } else {
-//
+
+      toDoItems = toDoItems?.filter("title CONTAINS[cd] %@", text).sorted(byKeyPath: "dateCreated", ascending: true)
+    } else {
+      loadData()
+    }
+
+    tableView.reloadData()
+  }
+
+  func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
+
+    if searchBar.text?.isEmpty == true {
+      loadData()
+
+      // This has to be executed in the main thread,
+      // it's a UI update
+      DispatchQueue.main.async {
+        searchBar.resignFirstResponder()
+      }
+
+    } else {
+
+      // 267. Querying data in Realm, commenting out CoreData implementation
 //      let request: NSFetchRequest<Item> = Item.fetchRequest()
 //
 //      let predicate = NSPredicate(format: "title CONTAINS[cd] %@", searchBar.text!)
 //      request.sortDescriptors = [NSSortDescriptor(key: "title", ascending: true)]
 //
 //      loadData(with: request, predicate: predicate)
-//    }
-//  }
-//}
+      toDoItems = toDoItems?.filter("title CONTAINS[cd] %@", searchBar.text!).sorted(byKeyPath: "dateCreated", ascending: true)
+
+    }
+
+    tableView.reloadData()
+  }
+}
 
